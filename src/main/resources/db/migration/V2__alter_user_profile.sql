@@ -1,0 +1,2 @@
+ALTER TABLE user_profile
+ADD COLUMN user_name VARCHAR UNIQUE;

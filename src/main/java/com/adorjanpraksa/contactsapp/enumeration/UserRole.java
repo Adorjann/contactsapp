@@ -1,7 +1,6 @@
 package com.adorjanpraksa.contactsapp.enumeration;
 
-public enum UserRole
-{
+public enum UserRole {
     USER,
     ADMIN
 }
