@@ -17,4 +17,8 @@ public class UserProfileService {
 
         return repository.findFirstByEmail(email);
     }
+
+    public Optional<UserProfile> findById(Long userProfileId) {
+        return repository.findById(userProfileId);
+    }
 }

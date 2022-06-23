@@ -32,7 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         else{
              Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
-            String role = String.format("ROLE_%s", userProfile.get().getRole().toString()) ;
+            String role = userProfile.get().getRole().toString();
 
             grantedAuthorities.add(new SimpleGrantedAuthority(role));
 
