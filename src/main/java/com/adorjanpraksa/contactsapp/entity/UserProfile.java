@@ -12,6 +12,7 @@ import java.util.Set;
 @Data
 public class UserProfile {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -23,6 +24,7 @@ public class UserProfile {
 
     @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL)
     private Set<Contact> contacts = new HashSet<Contact>();
+
 
 
 }

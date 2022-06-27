@@ -18,6 +18,7 @@ public interface ContactRepository extends JpaRepository<Contact,Long> {
             "(:firstName = NULL OR c.firstName = :firstName) AND " +
             "(:lastName = NULL OR c.lastName = :lastName) AND " +
             "(:address = NULL OR c.address = :address) AND " +
+            "(:phoneNumber = NULL OR c.phoneNumber = :phoneNumber) AND " +
             "(:typeName = NULL OR c.contactType.type = :typeName) AND " +
             "(:email = NULL OR c.userProfile.email = :email)")
     List<Contact> findByParams(@Param("firstName") String firstName,

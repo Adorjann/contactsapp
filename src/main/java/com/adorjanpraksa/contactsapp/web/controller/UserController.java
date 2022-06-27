@@ -3,6 +3,7 @@ package com.adorjanpraksa.contactsapp.web.controller;
 import com.adorjanpraksa.contactsapp.entity.Contact;
 import com.adorjanpraksa.contactsapp.service.impl.ContactService;
 import com.adorjanpraksa.contactsapp.web.dto.ContactDto;
+import com.adorjanpraksa.contactsapp.web.mapper.ContactMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,53 +20,55 @@ import java.util.List;
 @RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-    private final ContactService      contactService;
+    private final ContactService contactService;
+    private final ContactMapper contactMapper;
 
-    @GetMapping
-    public ResponseEntity<List<ContactDto>> get(@AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping("/contacts")
+    public ResponseEntity<List<ContactDto>> getContacts(@AuthenticationPrincipal UserDetails userDetails) {
 
         var Contacts = contactService.findAllUsersContacts(userDetails.getUsername());
 
-        return new ResponseEntity<>(contactService.toContactDto(Contacts), HttpStatus.OK);
+        return new ResponseEntity<>(contactMapper.mapToDto(Contacts), HttpStatus.OK);
     }
 
-    @PostMapping
+
+    @PostMapping("/create-contact")
     public ResponseEntity<ContactDto> createNew(@RequestBody @Valid ContactDto dto,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
 
-        var contactToSave =  contactService.toContact(dto);
+        var contactToSave = contactMapper.mapToEntity(dto,userDetails.getUsername());
         if (contactToSave.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         var savedContact = contactService.save(contactToSave.get());
 
-        return new ResponseEntity<>(contactService.toContactDto(savedContact), HttpStatus.CREATED);
+        return new ResponseEntity<>(contactMapper.mapToDto(savedContact), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ContactDto> edit(@PathVariable Long id,
-                                           @RequestBody @Valid ContactDto dto,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
+    @PutMapping("/edit-contact/{id}")
+    public ResponseEntity<ContactDto> editContact(@PathVariable Long id,
+                                                  @RequestBody @Valid ContactDto dto,
+                                                  @AuthenticationPrincipal UserDetails userDetails) {
 
-        var contactToUpdate =  contactService.toContact(dto);
+        var contactToUpdate = contactMapper.mapToEntity(dto, userDetails.getUsername(),id);
         if (contactToUpdate.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Contact updatedContact = contactService.update(contactToUpdate.get());
 
-        return new ResponseEntity<>(contactService.toContactDto(updatedContact), HttpStatus.OK);
+        return new ResponseEntity<>(contactMapper.mapToDto(updatedContact), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id,
-                                       @AuthenticationPrincipal UserDetails userDetails) {
+    @DeleteMapping("/delete-contact/{id}")
+    public ResponseEntity<Void> deleteContact(@PathVariable Long id,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
 
-            var deletedContact = contactService.delete(id);
-            if (deletedContact.isPresent()){
+        var deletedContact = contactService.delete(id, userDetails.getUsername());
+        if (deletedContact.isPresent()){
 
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 
