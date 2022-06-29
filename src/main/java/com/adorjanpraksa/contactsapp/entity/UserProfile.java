@@ -1,10 +1,8 @@
 package com.adorjanpraksa.contactsapp.entity;
 
-import com.adorjanpraksa.contactsapp.enumeration.UserRole;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +22,6 @@ public class UserProfile {
 
     @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL)
     private Set<Contact> contacts = new HashSet<Contact>();
-
 
 
 }

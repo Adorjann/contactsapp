@@ -2,11 +2,10 @@ package com.adorjanpraksa.contactsapp.service;
 
 import com.adorjanpraksa.contactsapp.entity.ContactType;
 import com.adorjanpraksa.contactsapp.repository.ContactTypeRepository;
-import com.adorjanpraksa.contactsapp.web.dto.ContactTypeDto;
+import com.adorjanpraksa.contactsapp.service.exception.DuplicateDataException;
+import com.adorjanpraksa.contactsapp.service.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -15,29 +14,43 @@ public class ContactTypeService {
     private final ContactTypeRepository repository;
 
     public ContactType saveNew(ContactType contactType) {
-        //contactType.setId(33L);
+
+        if (repository.existsContactTypeByType(contactType.getType())) {
+            throw new DuplicateDataException("Contact type " + contactType.getType() + " already exists.");
+        }
+
         return repository.save(contactType);
     }
 
-    public Optional<ContactType> findOneById(Long id){
-        return repository.findById(id);
-    }
+    public ContactType findById(Long contactTypeId) {
 
-    public Optional<ContactType> update(ContactType editedContactType,Long id) {
+        var contactType = repository.findById(contactTypeId);
 
-        var contactTypeFromDbOptional = findOneById(id);
-
-        if (contactTypeFromDbOptional.isEmpty()){
-            return Optional.empty();
+        if (contactType.isEmpty()) {
+            throw new NotFoundException("Contact type with id " + contactTypeId + " is not found");
         }
 
-        editedContactType.setId(contactTypeFromDbOptional.get().getId());
-        return Optional.of(repository.save(editedContactType));
+        return contactType.get();
     }
 
-    public Optional<ContactType> findByTypeName(String contactTypeName) {
+    public void update(ContactType editedContactType, Long contactTypeId) {
 
-        return repository.findByType(contactTypeName);
+        var contactTypeFromDb = findById(contactTypeId);
+
+        editedContactType.setId(contactTypeFromDb.getId());
+
+        repository.save(editedContactType);
+    }
+
+    public ContactType findByTypeName(String contactTypeName) {
+
+        var contactType = repository.findByType(contactTypeName);
+
+        if (contactType.isEmpty()) {
+            throw new NotFoundException("Contact Type " + contactTypeName + " is not found.");
+        }
+
+        return contactType.get();
     }
 
 }

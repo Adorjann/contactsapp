@@ -1,22 +1,21 @@
 package com.adorjanpraksa.contactsapp.web.controller;
 
-import com.adorjanpraksa.contactsapp.entity.UserProfile;
+import com.adorjanpraksa.contactsapp.service.ContactService;
 import com.adorjanpraksa.contactsapp.service.ContactTypeService;
-import com.adorjanpraksa.contactsapp.service.impl.ContactService;
-import com.adorjanpraksa.contactsapp.service.impl.UserProfileService;
+import com.adorjanpraksa.contactsapp.service.UserProfileService;
 import com.adorjanpraksa.contactsapp.web.dto.ContactTypeDto;
 import com.adorjanpraksa.contactsapp.web.dto.UserProfileCreationDto;
 import com.adorjanpraksa.contactsapp.web.dto.UserProfileDto;
 import com.adorjanpraksa.contactsapp.web.mapper.ContactTypeMapper;
 import com.adorjanpraksa.contactsapp.web.mapper.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,68 +23,84 @@ import javax.validation.Valid;
 public class AdminController {
 
     private final ContactTypeService contactTypeService;
-    private final ContactService     contactService;
+    private final ContactService contactService;
     private final UserProfileService userProfileService;
-    private final UserProfileMapper  userProfileMapper;
-    private final ContactTypeMapper  contactTypeMapper;
-    private final PasswordEncoder    passwordEncoder;
+    private final UserProfileMapper userProfileMapper;
+    private final ContactTypeMapper contactTypeMapper;
 
-    @PostMapping("/create-contact-type")
-    public ResponseEntity<ContactTypeDto> createNewContactType(@RequestBody @Valid ContactTypeDto dto) {
 
-        var savedType = contactTypeService.saveNew(contactTypeMapper.mapToEntity(dto));
+    @PostMapping("/contact-type")
+    public ResponseEntity<ContactTypeDto> createNewContactType(@RequestBody @Valid ContactTypeDto contactTypeDto,
+                                                               HttpServletRequest request) {
 
-        return new ResponseEntity<>(contactTypeMapper.mapToDto(savedType), HttpStatus.CREATED);
+        var contactTypeToSave = contactTypeMapper.mapToEntity(contactTypeDto);
+
+        var savedType = contactTypeService.saveNew(contactTypeToSave);
+
+        return ResponseEntity.created(getLocationHeader(request, "/admin/contact-type/", savedType.getId())).build();
     }
 
-    @PutMapping("/edit-contact-type/{id}")
-    public ResponseEntity<ContactTypeDto> editContactType(@PathVariable Long id,
+    private URI getLocationHeader(HttpServletRequest request, String urlPath, Long resourceId) {
+
+        return URI.create("http://".concat(request.getServerName().concat(":") + request.getServerPort())
+                .concat(urlPath).concat(resourceId.toString()));
+    }
+
+    @GetMapping("/contact-type/{contactTypeId}")
+    public ResponseEntity<ContactTypeDto> getOneContactType(@PathVariable Long contactTypeId) {
+
+        var contactType = contactTypeService.findById(contactTypeId);
+
+        return ResponseEntity.ok(contactTypeMapper.mapToDto(contactType));
+    }
+
+    @PutMapping("/contact-type/{contactTypeId}")
+    public ResponseEntity<ContactTypeDto> editContactType(@PathVariable Long contactTypeId,
                                                           @RequestBody @Valid ContactTypeDto dto) {
+
         var entityToUpdate = contactTypeMapper.mapToEntity(dto);
 
-        var updatedTypeOptional = contactTypeService.update(entityToUpdate, id);
-        if (updatedTypeOptional.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        contactTypeService.update(entityToUpdate, contactTypeId);
 
-        return new ResponseEntity<>(contactTypeMapper.mapToDto(updatedTypeOptional.get()), HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/delete-contact/{id}")                                  //todo test this
-    public ResponseEntity<Void> deleteContact(@PathVariable Long id) {
+    @DeleteMapping("/contact/{contactId}")
+    public ResponseEntity<Void> deleteContact(@PathVariable Long contactId) {
 
-        var deletedContact = contactService.delete(id);
-        if (deletedContact.isPresent()){
+        contactService.delete(contactId);
 
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
+        return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/create-user")
-    public ResponseEntity<UserProfileDto> createNewUserProfile(@RequestBody @Valid UserProfileCreationDto dto) {
+    @PostMapping("/user")
+    public ResponseEntity<UserProfileDto> createNewUserProfile(@RequestBody @Valid UserProfileCreationDto userProfileCreationDto,
+                                                               HttpServletRequest request) {
 
-        var userToSave = userProfileMapper.mapToEntity(dto);
-        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-        UserProfile savedUser = userProfileService.saveNew(userToSave);
+        var userToSave = userProfileMapper.mapToEntity(userProfileCreationDto);
 
+        var savedUser = userProfileService.saveNew(userToSave, userProfileCreationDto.getPassword());
 
-        return new ResponseEntity<>(userProfileMapper.mapToDto(savedUser), HttpStatus.CREATED);
+        return ResponseEntity.created(getLocationHeader(request, "/admin/user/", savedUser.getId())).build();
     }
 
-    @PutMapping("/edit-user/{id}")
-    public ResponseEntity<UserProfileDto> editUserProfile(@PathVariable Long id, @RequestBody @Valid UserProfileDto dto) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserProfileDto> getOneUser(@PathVariable Long userId) {
 
-        var userToUpdate = userProfileMapper.mapToEntity(dto);
+        var userProfile = userProfileService.findById(userId);
 
-        var updatedUserOptional = userProfileService.updateUserProfile(userToUpdate);
+        return ResponseEntity.ok(userProfileMapper.mapToDto(userProfile));
+    }
 
-        if (updatedUserOptional.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @PutMapping("/user/{userId}")
+    public ResponseEntity<UserProfileDto> editUserProfile(@PathVariable Long userId,
+                                                          @RequestBody @Valid UserProfileDto userProfileDto) {
 
-        return new ResponseEntity<>(userProfileMapper.mapToDto(updatedUserOptional.get()), HttpStatus.OK);
+        var userToUpdate = userProfileMapper.mapToEntity(userProfileDto);
+
+        userProfileService.updateUserProfile(userToUpdate, userId);
+
+        return ResponseEntity.noContent().build();
     }
 
 

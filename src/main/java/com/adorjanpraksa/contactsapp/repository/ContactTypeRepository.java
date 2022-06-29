@@ -9,4 +9,7 @@ import java.util.Optional;
 @Repository
 public interface ContactTypeRepository extends JpaRepository<ContactType,Long> {
     Optional<ContactType> findByType(String contactTypeName);
+
+
+    boolean existsContactTypeByType(String type);
 }
