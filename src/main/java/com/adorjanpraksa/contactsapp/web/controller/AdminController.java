@@ -73,6 +73,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    
     @PostMapping("/user")
     public ResponseEntity<UserProfileDto> createNewUserProfile(@RequestBody @Valid UserProfileCreationDto userProfileCreationDto,
                                                                HttpServletRequest request) {

@@ -5,44 +5,43 @@ import com.adorjanpraksa.contactsapp.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @RequiredArgsConstructor
 @Configuration
-@EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    //todo provericemo web adapter
+public class SecurityConfiguration {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
                 .csrf().disable()
-                .headers().disable()
-                .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
-                .antMatchers("/user/**").hasAuthority(UserRole.USER.name())
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
+                .authorizeHttpRequests((auth) -> auth
+                        .antMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
+                        .antMatchers("/user/**").hasAuthority(UserRole.USER.name())
+                        .antMatchers("/**").denyAll()
+                        .anyRequest().authenticated()
+                )
+                .httpBasic()
+                .and().build();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(this.userDetailsService)
-                .passwordEncoder(passwordEncoder());
+    @Bean
+    public DaoAuthenticationProvider userDetailsService() {
+        DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
+        auth.setUserDetailsService(this.userDetailsService);
+        auth.setPasswordEncoder(passwordEncoder());
+        return auth;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 

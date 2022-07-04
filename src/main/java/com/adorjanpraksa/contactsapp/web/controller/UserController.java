@@ -49,7 +49,6 @@ public class UserController {
 
         var savedContact = contactService.save(contactToSave, userDetails.getId(), contactDto.getContactTypeName());
 
-
         return ResponseEntity.created(getLocationHeader(request, "/user/contact/", savedContact.getId())).build();
     }
 

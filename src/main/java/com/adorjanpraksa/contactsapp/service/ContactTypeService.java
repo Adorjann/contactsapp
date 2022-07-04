@@ -1,9 +1,7 @@
 package com.adorjanpraksa.contactsapp.service;
 
 import com.adorjanpraksa.contactsapp.entity.ContactType;
-import com.adorjanpraksa.contactsapp.repository.ContactTypeRepository;
-import com.adorjanpraksa.contactsapp.service.exception.DuplicateDataException;
-import com.adorjanpraksa.contactsapp.service.exception.NotFoundException;
+import com.adorjanpraksa.contactsapp.service.dao.ContactTypesDao;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,46 +9,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContactTypeService {
 
-    private final ContactTypeRepository repository;
+    private final ContactTypesDao contactTypesDao;
 
     public ContactType saveNew(ContactType contactType) {
 
-        if (repository.existsContactTypeByType(contactType.getType())) {
-            throw new DuplicateDataException("Contact type " + contactType.getType() + " already exists.");
-        }
-
-        return repository.save(contactType);
+        return contactTypesDao.save(contactType);
     }
 
     public ContactType findById(Long contactTypeId) {
 
-        var contactType = repository.findById(contactTypeId);
-
-        if (contactType.isEmpty()) {
-            throw new NotFoundException("Contact type with id " + contactTypeId + " is not found");
-        }
-
-        return contactType.get();
+        return contactTypesDao.findById(contactTypeId);
     }
 
     public void update(ContactType editedContactType, Long contactTypeId) {
 
-        var contactTypeFromDb = findById(contactTypeId);
+        var contactTypeFromDb = contactTypesDao.findById(contactTypeId);
 
-        editedContactType.setId(contactTypeFromDb.getId());
+        contactTypeFromDb.setType(editedContactType.getType());
 
-        repository.save(editedContactType);
+        contactTypesDao.save(contactTypeFromDb);
     }
 
-    public ContactType findByTypeName(String contactTypeName) {
-
-        var contactType = repository.findByType(contactTypeName);
-
-        if (contactType.isEmpty()) {
-            throw new NotFoundException("Contact Type " + contactTypeName + " is not found.");
-        }
-
-        return contactType.get();
-    }
 
 }

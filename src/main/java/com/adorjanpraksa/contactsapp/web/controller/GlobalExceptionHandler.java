@@ -7,11 +7,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 @ResponseBody
@@ -50,6 +56,27 @@ public class GlobalExceptionHandler {
                         .status(HttpStatus.CONFLICT)
                         .message(exception.getMessage())
                         .build());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.builder()
+                        .data(argumentNotValidExceptionErrorMessage(exception))
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message("Data validation failed")
+                        .build());
+    }
+
+    private Map<String, String> argumentNotValidExceptionErrorMessage(MethodArgumentNotValidException exception) {
+
+        return exception.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        DefaultMessageSourceResolvable::getDefaultMessage
+                ));
+
     }
 
     @ExceptionHandler(RuntimeException.class)
