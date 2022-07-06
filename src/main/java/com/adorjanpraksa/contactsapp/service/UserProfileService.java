@@ -27,21 +27,15 @@ public class UserProfileService {
 
         userProfile.setPassword(passwordEncoder.encode(clearTextPassword));
 
-        userProfileDao.save(userProfile);
+        var savedUserProfile = userProfileDao.save(userProfile);
         notificationDao.sendEmail(userProfile.getFirstName(), userProfile.getEmail());
 
-        return userProfile;
+        return savedUserProfile;
     }
 
 
-    public void updateUserProfile(UserProfile editedUser, Long userId) {
+    public void updateUserProfile(UserProfile editedUser) {
 
-        var userFromDb = userProfileDao.findById(userId);
-
-        userFromDb.setEmail(editedUser.getEmail());
-        userFromDb.setFirstName(editedUser.getFirstName());
-        userFromDb.setLastName(editedUser.getLastName());
-
-        userProfileDao.update(userFromDb);
+        userProfileDao.update(editedUser);
     }
 }

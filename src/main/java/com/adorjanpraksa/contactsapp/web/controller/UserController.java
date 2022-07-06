@@ -1,19 +1,24 @@
 package com.adorjanpraksa.contactsapp.web.controller;
 
+import com.adorjanpraksa.contactsapp.entity.Contact;
 import com.adorjanpraksa.contactsapp.security.CustomUserDetails;
 import com.adorjanpraksa.contactsapp.service.ContactService;
 import com.adorjanpraksa.contactsapp.web.dto.ContactDto;
+import com.adorjanpraksa.contactsapp.web.dto.PageDto;
 import com.adorjanpraksa.contactsapp.web.mapper.ContactMapper;
+import com.adorjanpraksa.contactsapp.web.mapper.PageMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -23,12 +28,20 @@ public class UserController {
     private final ContactService contactService;
     private final ContactMapper contactMapper;
 
+    private final PageMapper pageMapper;
+
+
     @GetMapping("/contacts")
-    public ResponseEntity<List<ContactDto>> getContacts(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<PageDto> getContacts(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                               @PageableDefault Pageable pageable) {
 
-        var Contacts = contactService.findAllUsersContacts(userDetails.getId());
 
-        return ResponseEntity.ok(contactMapper.mapToDto(Contacts));
+        Page<Contact> contacts = contactService.findAllUsersContactsPaginated(userDetails.getId(), pageable);
+
+        var pageDto = pageMapper.mapToDto(contacts.map(contactMapper::mapToDto));
+
+        return ResponseEntity.ok(pageDto);
+
     }
 
     @GetMapping("/contact/{contactId}")
@@ -41,7 +54,7 @@ public class UserController {
     }
 
     @PostMapping("/contact")
-    public ResponseEntity<ContactDto> createNewContact(@RequestBody @Valid ContactDto contactDto,
+    public ResponseEntity<ContactDto> createNewContact(@RequestBody @Validated(ContactDto.CreateContact.class) ContactDto contactDto,
                                                        @AuthenticationPrincipal CustomUserDetails userDetails,
                                                        HttpServletRequest request) {
 
@@ -60,12 +73,13 @@ public class UserController {
 
     @PutMapping("/contact/{contactId}")
     public ResponseEntity<ContactDto> editContact(@PathVariable Long contactId,
-                                                  @RequestBody @Valid ContactDto contactDto,
+                                                  @RequestBody @Validated(ContactDto.UpdateContact.class) ContactDto contactDto,
                                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        var contactToUpdate = contactMapper.mapToEntity(contactDto);
+        var contactFromDb = contactService.findOneUsersContact(contactId, userDetails.getId());
+        var contactToUpdate = contactMapper.mapToEntity(contactFromDb, contactDto);
 
-        contactService.update(contactToUpdate, contactId, userDetails.getId(), contactDto.getContactTypeName());
+        contactService.update(contactToUpdate, contactDto.getContactTypeName());
 
         return ResponseEntity.noContent().build();
     }

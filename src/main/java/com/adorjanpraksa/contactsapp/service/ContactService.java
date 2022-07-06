@@ -5,9 +5,12 @@ import com.adorjanpraksa.contactsapp.service.dao.ContactTypesDao;
 import com.adorjanpraksa.contactsapp.service.dao.ContactsDao;
 import com.adorjanpraksa.contactsapp.service.dao.UserProfileDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -39,19 +42,14 @@ public class ContactService {
         return contactsDao.save(contact);
     }
 
-    public void update(Contact editedContact, Long contactId, Long userId, String contactTypeName) {
+    public void update(Contact editedContact, String contactTypeName) {
 
-        var contactToUpdate = contactsDao.getOneUsersContact(contactId, userId);
+        if (Objects.nonNull(contactTypeName)) {
+            var contactType = contactTypesDao.findByTypeName(contactTypeName);
+            editedContact.setContactType(contactType);
+        }
 
-        var contactType = contactTypesDao.findByTypeName(contactTypeName);
-
-        contactToUpdate.setFirstName(editedContact.getFirstName());
-        contactToUpdate.setLastName(editedContact.getLastName());
-        contactToUpdate.setAddress(editedContact.getAddress());
-        contactToUpdate.setPhoneNumber(editedContact.getPhoneNumber());
-        contactToUpdate.setContactType(contactType);
-
-        contactsDao.save(contactToUpdate);
+        contactsDao.save(editedContact);
     }
 
     public void delete(Long contactId, Long userId) {
@@ -67,4 +65,13 @@ public class ContactService {
     }
 
 
+    public Page<Contact> getAllContactsPaginated(Pageable pageable) {
+
+        return contactsDao.getAllContacts(pageable);
+    }
+
+    public Page<Contact> findAllUsersContactsPaginated(Long userId, Pageable pageable) {
+
+        return contactsDao.findAllUsersContacts(userId, pageable);
+    }
 }

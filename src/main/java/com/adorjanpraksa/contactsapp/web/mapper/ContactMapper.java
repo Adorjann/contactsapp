@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
+
 @Component
 public class ContactMapper {
 
@@ -18,6 +20,24 @@ public class ContactMapper {
         contact.setLastName(dto.getLastName());
         contact.setAddress(dto.getAddress());
         contact.setPhoneNumber(dto.getPhoneNumber());
+
+        return contact;
+    }
+
+    public Contact mapToEntity(Contact contact, ContactDto contactDto) {
+
+        if (nonNull(contactDto.getFirstName())) {
+            contact.setFirstName(contactDto.getFirstName());
+        }
+        if (nonNull(contactDto.getLastName())) {
+            contact.setLastName(contactDto.getLastName());
+        }
+        if (nonNull(contactDto.getAddress())) {
+            contact.setAddress(contactDto.getAddress());
+        }
+        if (nonNull(contactDto.getPhoneNumber())) {
+            contact.setPhoneNumber(contactDto.getPhoneNumber());
+        }
 
         return contact;
     }

@@ -5,6 +5,8 @@ import com.adorjanpraksa.contactsapp.repository.ContactRepository;
 import com.adorjanpraksa.contactsapp.service.exception.ForbiddenAccessException;
 import com.adorjanpraksa.contactsapp.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -51,5 +53,15 @@ public class ContactsDao {
         }
 
         return contact;
+    }
+
+    public Page<Contact> getAllContacts(Pageable pageable) {
+
+        return contactRepository.findAll(pageable);
+    }
+
+    public Page<Contact> findAllUsersContacts(Long userId, Pageable pageable) {
+
+        return contactRepository.findByUserProfileId(userId, pageable);
     }
 }
