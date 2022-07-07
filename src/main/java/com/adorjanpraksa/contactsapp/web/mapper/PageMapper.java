@@ -14,7 +14,7 @@ public class PageMapper {
         dto.setContent(page.getContent());
         dto.setPageNumber(page.getNumber());
         dto.setSize(page.getSize());
-        dto.setTotalElements(page.getNumberOfElements());
+        dto.setTotalElements(page.getTotalElements());
 
         return dto;
     }

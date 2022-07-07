@@ -8,6 +8,6 @@ import javax.validation.constraints.NotBlank;
 public class UserProfileCreationDto extends UserProfileDto {
 
 
-    @NotBlank(groups = ContactDto.CreateContact.class)
+    @NotBlank(groups = CreateUserProfile.class)
     private String password;
 }

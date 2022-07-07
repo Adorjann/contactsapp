@@ -10,7 +10,7 @@ public class PageDto<T> {
     private T content;
     private int pageNumber;
     private int Size;
-    private int totalElements;
+    private Long totalElements;
 
 
 }
