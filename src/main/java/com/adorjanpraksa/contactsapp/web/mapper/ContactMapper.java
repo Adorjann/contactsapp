@@ -4,6 +4,7 @@ import com.adorjanpraksa.contactsapp.entity.Contact;
 import com.adorjanpraksa.contactsapp.web.dto.ContactDto;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ public class ContactMapper {
         contact.setLastName(dto.getLastName());
         contact.setAddress(dto.getAddress());
         contact.setPhoneNumber(dto.getPhoneNumber());
+        contact.setCreatedAt(LocalDateTime.now());
 
         return contact;
     }
@@ -41,7 +43,6 @@ public class ContactMapper {
 
         return contact;
     }
-
 
     public ContactDto mapToDto(Contact contact) {
 

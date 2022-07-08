@@ -25,6 +25,5 @@ public class EmailService {
         mailMessage.setText("Hi " + recipientName + " Thank you for choosing Contact Manager! Enjoy the experience..");
 
         javaMailSender.send(mailMessage);
-
     }
 }

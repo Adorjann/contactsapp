@@ -10,6 +10,7 @@ import static java.util.Objects.nonNull;
 
 @Component
 public class UserProfileMapper {
+
     public UserProfile mapToEntity(UserProfile userProfile, UserProfileDto dto) {
 
         if (nonNull(dto.getEmail())) {

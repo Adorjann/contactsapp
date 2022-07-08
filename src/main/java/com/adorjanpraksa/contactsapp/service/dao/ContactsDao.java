@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -55,13 +56,14 @@ public class ContactsDao {
         return contact;
     }
 
-    public Page<Contact> getAllContacts(Pageable pageable) {
+    public Page<Contact> getAllContacts(Pageable pageable, LocalDateTime from, LocalDateTime to) {
 
-        return contactRepository.findAll(pageable);
+        return contactRepository.findAllByCreatedAtBetween(pageable, from, to);
     }
 
     public Page<Contact> findAllUsersContacts(Long userId, Pageable pageable) {
 
         return contactRepository.findByUserProfileId(userId, pageable);
     }
+
 }

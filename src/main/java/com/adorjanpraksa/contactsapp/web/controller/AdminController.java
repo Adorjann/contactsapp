@@ -4,13 +4,9 @@ import com.adorjanpraksa.contactsapp.entity.Contact;
 import com.adorjanpraksa.contactsapp.service.ContactService;
 import com.adorjanpraksa.contactsapp.service.ContactTypeService;
 import com.adorjanpraksa.contactsapp.service.UserProfileService;
-import com.adorjanpraksa.contactsapp.web.dto.ContactTypeDto;
-import com.adorjanpraksa.contactsapp.web.dto.PageDto;
-import com.adorjanpraksa.contactsapp.web.dto.UserProfileCreationDto;
-import com.adorjanpraksa.contactsapp.web.dto.UserProfileDto;
+import com.adorjanpraksa.contactsapp.web.dto.*;
 import com.adorjanpraksa.contactsapp.web.mapper.ContactMapper;
 import com.adorjanpraksa.contactsapp.web.mapper.ContactTypeMapper;
-import com.adorjanpraksa.contactsapp.web.mapper.PageMapper;
 import com.adorjanpraksa.contactsapp.web.mapper.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,16 +32,19 @@ public class AdminController {
     private final UserProfileMapper userProfileMapper;
     private final ContactTypeMapper contactTypeMapper;
     private final ContactMapper contactMapper;
-    private final PageMapper pageMapper;
 
-    @GetMapping("/contacts")
-    public ResponseEntity<PageDto> getAllContacts(@PageableDefault Pageable pageable) {
+    @PostMapping("/contacts")
+    public ResponseEntity<PageDto> getAllContacts(@PageableDefault Pageable pageable,
+                                                  @RequestBody @Valid AllContactsRequestDto allContactsRequestDto) {
 
-        Page<Contact> page = contactService.getAllContactsPaginated(pageable);
+        Page<Contact> page = contactService.getAllContacts(pageable, allContactsRequestDto.getFrom(), allContactsRequestDto.getTo());
 
-        var pageDto = pageMapper.mapToDto(page.map(contactMapper::mapToDto));
-
-        return ResponseEntity.ok(pageDto);
+        return ResponseEntity.ok(PageDto.builder()
+                .content(page.map(contactMapper::mapToDto).getContent())
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .build());
     }
 
     @PostMapping("/contact-type")
@@ -118,9 +117,11 @@ public class AdminController {
 
         var userFromDb = userProfileService.findById(userId);
 
+        var oldEmail = userFromDb.getEmail();
+
         var userToUpdate = userProfileMapper.mapToEntity(userFromDb, userProfileDto);
 
-        userProfileService.updateUserProfile(userToUpdate);
+        userProfileService.updateUserProfile(oldEmail, userToUpdate);
 
         return ResponseEntity.noContent().build();
     }

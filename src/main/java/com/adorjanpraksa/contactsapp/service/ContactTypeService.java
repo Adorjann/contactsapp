@@ -29,6 +29,4 @@ public class ContactTypeService {
 
         contactTypesDao.save(contactTypeFromDb);
     }
-
-
 }

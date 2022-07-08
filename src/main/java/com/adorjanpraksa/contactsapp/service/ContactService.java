@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +20,6 @@ public class ContactService {
     private final ContactTypesDao contactTypesDao;
     private final UserProfileDao userProfileDao;
     private final ContactsDao contactsDao;
-
 
     public List<Contact> findAllUsersContacts(Long userId) {
 
@@ -64,10 +64,9 @@ public class ContactService {
         contactsDao.delete(contactId);
     }
 
+    public Page<Contact> getAllContacts(Pageable pageable, LocalDateTime from, LocalDateTime to) {
 
-    public Page<Contact> getAllContactsPaginated(Pageable pageable) {
-
-        return contactsDao.getAllContacts(pageable);
+        return contactsDao.getAllContacts(pageable, from, to);
     }
 
     public Page<Contact> findAllUsersContactsPaginated(Long userId, Pageable pageable) {

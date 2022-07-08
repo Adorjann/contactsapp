@@ -33,9 +33,8 @@ public class UserProfileService {
         return savedUserProfile;
     }
 
+    public void updateUserProfile(String oldEmail, UserProfile editedUserProfile) {
 
-    public void updateUserProfile(UserProfile editedUser) {
-
-        userProfileDao.update(editedUser);
+        userProfileDao.update(oldEmail, editedUserProfile);
     }
 }

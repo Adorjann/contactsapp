@@ -3,6 +3,7 @@ package com.adorjanpraksa.contactsapp.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -20,10 +21,12 @@ public class Contact {
 
     private String phoneNumber;
 
-    @ManyToOne
+    private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private ContactType contactType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private UserProfile userProfile;
 
 

@@ -6,7 +6,6 @@ import com.adorjanpraksa.contactsapp.service.ContactService;
 import com.adorjanpraksa.contactsapp.web.dto.ContactDto;
 import com.adorjanpraksa.contactsapp.web.dto.PageDto;
 import com.adorjanpraksa.contactsapp.web.mapper.ContactMapper;
-import com.adorjanpraksa.contactsapp.web.mapper.PageMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,20 +27,19 @@ public class UserController {
     private final ContactService contactService;
     private final ContactMapper contactMapper;
 
-    private final PageMapper pageMapper;
-
 
     @GetMapping("/contacts")
     public ResponseEntity<PageDto> getContacts(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                @PageableDefault Pageable pageable) {
 
+        Page<Contact> page = contactService.findAllUsersContactsPaginated(userDetails.getId(), pageable);
 
-        Page<Contact> contacts = contactService.findAllUsersContactsPaginated(userDetails.getId(), pageable);
-
-        var pageDto = pageMapper.mapToDto(contacts.map(contactMapper::mapToDto));
-
-        return ResponseEntity.ok(pageDto);
-
+        return ResponseEntity.ok(PageDto.builder()
+                .content(page.map(contactMapper::mapToDto))
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .build());
     }
 
     @GetMapping("/contact/{contactId}")

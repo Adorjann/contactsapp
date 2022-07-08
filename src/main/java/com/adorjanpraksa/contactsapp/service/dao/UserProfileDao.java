@@ -28,19 +28,15 @@ public class UserProfileDao {
         return userProfileRepository.save(userProfile);
     }
 
-    public void update(UserProfile userProfile) {
+    public void update(String oldEmail, UserProfile editedUserProfile) {
 
-        var userFromDb = userProfileRepository.findByEmail(userProfile.getEmail());
-        if (userFromDb.isPresent()) {
-
-            if (!userFromDb.get().getId().equals(userProfile.getId())) {
-                //email is changed into an existing mail
-                throw new DuplicateDataException("User with email " + userProfile.getEmail() + " already exists");
+        if (!oldEmail.equals(editedUserProfile.getEmail())) {
+            if (userProfileRepository.existsByEmail(editedUserProfile.getEmail())) {
+                throw new DuplicateDataException("User with email " + editedUserProfile.getEmail() + " already exists");
             }
-        }
-        //email is changed into non-existing mail
-        //email is not changed
-        userProfileRepository.save(userProfile);
-    }
 
+        }
+
+        userProfileRepository.save(editedUserProfile);
+    }
 }

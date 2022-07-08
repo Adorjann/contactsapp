@@ -35,6 +35,4 @@ public class ContactTypesDao {
                 .orElseThrow(() -> new NotFoundException("Contact type with id " + contactTypeId + " is not found"));
 
     }
-
-
 }

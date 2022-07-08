@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContactTypeMapper {
 
-
     public ContactType mapToEntity(ContactTypeDto dto) {
 
         var entity = new ContactType();
