@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -20,11 +19,6 @@ public class ContactService {
     private final ContactTypesDao contactTypesDao;
     private final UserProfileDao userProfileDao;
     private final ContactsDao contactsDao;
-
-    public List<Contact> findAllUsersContacts(Long userId) {
-
-        return contactsDao.getAllUsersContacts(userId);
-    }
 
     public Contact findOneUsersContact(Long contactId, Long userId) {
 
@@ -69,7 +63,7 @@ public class ContactService {
         return contactsDao.getAllContacts(pageable, from, to);
     }
 
-    public Page<Contact> findAllUsersContactsPaginated(Long userId, Pageable pageable) {
+    public Page<Contact> findAllUsersContacts(Long userId, Pageable pageable) {
 
         return contactsDao.findAllUsersContacts(userId, pageable);
     }

@@ -32,7 +32,7 @@ public class UserController {
     public ResponseEntity<PageDto> getContacts(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                @PageableDefault Pageable pageable) {
 
-        Page<Contact> page = contactService.findAllUsersContactsPaginated(userDetails.getId(), pageable);
+        Page<Contact> page = contactService.findAllUsersContacts(userDetails.getId(), pageable);
 
         return ResponseEntity.ok(PageDto.builder()
                 .content(page.map(contactMapper::mapToDto))
