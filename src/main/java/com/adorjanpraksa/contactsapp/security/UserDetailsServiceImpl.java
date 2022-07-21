@@ -1,7 +1,6 @@
 package com.adorjanpraksa.contactsapp.security;
 
-import com.adorjanpraksa.contactsapp.entity.UserProfile;
-import com.adorjanpraksa.contactsapp.repository.UserProfileRepository;
+import com.adorjanpraksa.contactsapp.service.dao.UserProfileDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -19,29 +17,22 @@ import java.util.Set;
 @Primary
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserProfileRepository userProfileRepository;
+    private final UserProfileDao userProfileDao;
 
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Optional<UserProfile> userProfile = userProfileRepository.findByEmail(username);
+        var userProfile = userProfileDao.findByEmail(username);
 
-        if (userProfile.isEmpty()) {
-            throw new UsernameNotFoundException(String.format("No user found with eMail '%s'.", username));
-        } else {
-            Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>() {{
+            add(new SimpleGrantedAuthority(userProfile.getRole().toString()));
+        }};
 
-            String role = userProfile.get().getRole().toString();
-
-            grantedAuthorities.add(new SimpleGrantedAuthority(role));
-
-            return CustomUserDetails.builder()
-                    .id(userProfile.get().getId())
-                    .password(userProfile.get().getPassword())
-                    .email(userProfile.get().getEmail())
-                    .grantedAuthorities(grantedAuthorities)
-                    .build();
-
-        }
+        return CustomUserDetails.builder()
+                .id(userProfile.getId())
+                .password(userProfile.getPassword())
+                .email(userProfile.getEmail())
+                .grantedAuthorities(grantedAuthorities)
+                .build();
     }
 }

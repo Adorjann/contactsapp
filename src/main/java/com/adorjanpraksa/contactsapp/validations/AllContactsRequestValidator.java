@@ -1,4 +1,4 @@
-package com.adorjanpraksa.contactsapp.validations.allContactsRequest;
+package com.adorjanpraksa.contactsapp.validations;
 
 import com.adorjanpraksa.contactsapp.web.dto.AllContactsRequestDto;
 

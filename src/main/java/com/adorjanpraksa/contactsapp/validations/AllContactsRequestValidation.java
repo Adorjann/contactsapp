@@ -1,4 +1,4 @@
-package com.adorjanpraksa.contactsapp.validations.allContactsRequest;
+package com.adorjanpraksa.contactsapp.validations;
 
 
 import javax.validation.Constraint;

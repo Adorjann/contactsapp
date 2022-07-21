@@ -5,8 +5,6 @@ import com.adorjanpraksa.contactsapp.web.dto.ContactDto;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -57,8 +55,5 @@ public class ContactMapper {
         return dto;
     }
 
-    public List<ContactDto> mapToDto(List<Contact> contacts) {
 
-        return contacts.stream().map(this::mapToDto).collect(Collectors.toList());
-    }
 }

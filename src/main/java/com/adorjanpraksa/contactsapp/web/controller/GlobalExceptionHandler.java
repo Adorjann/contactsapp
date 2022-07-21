@@ -3,10 +3,7 @@ package com.adorjanpraksa.contactsapp.web.controller;
 import com.adorjanpraksa.contactsapp.service.exception.DuplicateDataException;
 import com.adorjanpraksa.contactsapp.service.exception.ForbiddenAccessException;
 import com.adorjanpraksa.contactsapp.service.exception.NotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,14 +88,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    @Data
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ErrorResponse<T> {
-
-        private T data;
-        private HttpStatus status;
-        private String message;
+    public record ErrorResponse<T>(T data, HttpStatus status, String message) {
     }
 }

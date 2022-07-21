@@ -35,7 +35,7 @@ public class UserController {
         Page<Contact> page = contactService.findAllUsersContacts(userDetails.getId(), pageable);
 
         return ResponseEntity.ok(PageDto.builder()
-                .content(page.map(contactMapper::mapToDto))
+                .content(page.map(contactMapper::mapToDto).getContent())
                 .pageNumber(page.getNumber())
                 .pageSize(page.getSize())
                 .totalElements(page.getTotalElements())

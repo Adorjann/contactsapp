@@ -1,6 +1,6 @@
 package com.adorjanpraksa.contactsapp.web.dto;
 
-import com.adorjanpraksa.contactsapp.validations.allContactsRequest.AllContactsRequestValidation;
+import com.adorjanpraksa.contactsapp.validations.AllContactsRequestValidation;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;

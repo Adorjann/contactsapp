@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -23,11 +22,6 @@ public class ContactsDao {
         return contactRepository.findById(contactId)
                 .orElseThrow(() -> new NotFoundException("Contact with id " + contactId + " is not found."));
 
-    }
-
-    public List<Contact> getAllUsersContacts(Long userId) {
-
-        return contactRepository.findByUserProfileId(userId);
     }
 
     public Contact save(Contact contact) {
