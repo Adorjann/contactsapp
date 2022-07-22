@@ -3,6 +3,7 @@ package com.adorjanpraksa.contactsapp.web.controller;
 import com.adorjanpraksa.contactsapp.entity.Contact;
 import com.adorjanpraksa.contactsapp.service.ContactService;
 import com.adorjanpraksa.contactsapp.service.ContactTypeService;
+import com.adorjanpraksa.contactsapp.service.NasaService;
 import com.adorjanpraksa.contactsapp.service.UserProfileService;
 import com.adorjanpraksa.contactsapp.web.dto.*;
 import com.adorjanpraksa.contactsapp.web.mapper.ContactMapper;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,6 +35,14 @@ public class AdminController {
     private final UserProfileMapper userProfileMapper;
     private final ContactTypeMapper contactTypeMapper;
     private final ContactMapper contactMapper;
+    private final NasaService nasaService;
+
+    @GetMapping("/rover-images")
+    public ResponseEntity<Map<String, List<String>>> getMarsImages(@RequestParam(name = "rover") String rover,
+                                                                   @RequestParam(name = "camera") String camera){
+
+        return ResponseEntity.ok(nasaService.getImages(rover,camera));
+    }
 
     @PostMapping("/contacts")
     public ResponseEntity<PageDto> getAllContacts(@PageableDefault Pageable pageable,
